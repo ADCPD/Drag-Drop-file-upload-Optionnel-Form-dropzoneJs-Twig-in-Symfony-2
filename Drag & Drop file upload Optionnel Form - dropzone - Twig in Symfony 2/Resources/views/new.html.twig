@@ -1,0 +1,59 @@
+{% extends 'ReglementairesErcBundle:Default:base-reglementaire-formation-erc.html.twig' %}
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('bundles/reglementaireserc/css/dropzone/basic.css') }}">
+    <link rel="stylesheet" href="{{ asset('bundles/reglementaireserc/css/dropzone/dropzone.css') }}">
+
+{% endblock %}
+{% block breadcrumbList %}
+    {{ parent() }}
+    <li>
+        <a href="{{ path('erc') }}">Thèmatique ERC</a>
+        <span class="divider">/</span>
+        Upload
+    </li>
+{% endblock breadcrumbList %}
+{% block content %}
+    <div class="row-fluid">
+        <div class="span12 container well">
+            <div class="page-header ">
+                <h3>Thèmatiques ERC
+                    <small> Upload</small>
+                </h3>
+                <a href="{{ path('erc') }}" class="btn btn-primary" style="float: right;">
+                    Retour à la liste de résultats
+                </a>
+            </div>
+            <form action="{{ path('reglementaires_thematique_erc_import_new_create') }}"
+                  method="post" {{ form_enctype(form) }} >
+                {{ form_errors(form) }}
+
+                {% for row in form|batch(4,'') %}
+                    <div class="row-fluid">
+                        {% for form in row %}
+                            <div class="span3">
+                                {{ form_row(form) }}
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endfor %}
+                {{ form_rest(form) }}
+
+                <div class="clearfix visible-xs-block"></div>
+                <hr>
+                <button class="btn btn-success " type="submit">Valider</button>
+                <button class="btn btn-default" style="float: right;" type="reset">Annuler</button>
+            </form>
+        </div>
+    </div>
+{% endblock %}
+    {% block javascripts %}
+
+        <script type="text/javascripts"
+                src="{{ asset('bundles/reglementaireserc/js/dropzone/dropzone.js') }}"></script>
+        <script type="text/javascript">
+            $(document).ready(function () {
+
+            });
+        </script>
+    {% endblock %}
