@@ -14,6 +14,9 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 class ErcUploadThematiqueType extends AbstractType
 {
     /**
+     * Cette methode permet de creer un input file dynamiquement 
+     * pour chaque instance de la class ERC
+     * 
      * @param FormBuilderInterface $builder
      * @param array $options
      */
