@@ -27,38 +27,11 @@ class UploadThematiqueErcController extends Controller
      * @return \Symfony\Component\HttpFoundation\Response
      */
     public function createAction(Request $request)
-    {
-        /** @var Erc $erc */
-        $erc = new  Erc();
-        /** @var AdminUploadFiles $file_to_upload */
-        $file_to_upload = new AdminUploadFiles();
-
-        $em = $this->getDoctrine()->getManager();
-        $ercs = $em->getRepository('ReglementairesErcBundle:Erc')->findAll();
-
-        $form = $this->createForm(new ErcUploadThematiqueType(), array('file' => $file_to_upload), array('ercs' => $ercs));
-
-        if ($request->isMethod('POST')) {
-            $form->bind($this->getRequest());
-            if ($form->isValid()) {
-                $uniq_key = uniqid();
-                $key = "thematique_erc_" . $uniq_key;
-                $file_to_upload->setKeyFile($key);
-                $file_to_upload->setDateUpload(new \DateTime("now"));
-                $name = $erc->getLibelle() . "_" . $uniq_key;
-                $file_to_upload->setNameFile($name);
-                $em->persist($file_to_upload);
-                $em->flush();
-            }
-        }
-        return $this->render('ReglementairesErcBundle:UploadThematiqueErc:new.html.twig', array(
-            'ercs' => $ercs,
-            'form' => $form->createView(),
-        ));
-
-
-        /*
+     
           $entity = new Erc;
+          $em = $this->getDoctrine()->getManager();
+          $ercs = $em->getRepository('ReglementairesErcBundle:Erc')->findAll();
+        
           $form = $this->createForm(new ErcUploadThematiqueType(), $entity);
           $form->bind($request);
           $em = $this->getDoctrine()->getManager();
@@ -71,10 +44,10 @@ class UploadThematiqueErcController extends Controller
           }
           $this->get("session")->getFlashBag()->add(FlashMessageConsts::MESSAGE_ERROR, "Vos données n'ont pas été correctement enregistrées.");
           return $this->render('ReglementairesErcBundle:UploadThematiqueErc:new.html.twig', array(
-              'entities' => $entity,
+              'ercs' => $ercs,
               'form' => $form->createView(),
           ));
-        */
+        
     }
 
     /**
@@ -91,8 +64,7 @@ class UploadThematiqueErcController extends Controller
 
         return $this->render('ReglementairesErcBundle:UploadThematiqueErc:new.html.twig', array(
             'form' => $form->createView(),
-            'ercs' => $ercs,
-
+ 
         ));
     }
 }
