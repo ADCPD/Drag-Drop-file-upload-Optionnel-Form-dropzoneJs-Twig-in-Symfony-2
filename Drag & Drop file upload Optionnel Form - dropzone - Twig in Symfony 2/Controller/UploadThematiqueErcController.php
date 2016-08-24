@@ -22,32 +22,64 @@ class UploadThematiqueErcController extends Controller
 {
 
     /**
-     * Methood de sauvergarde des fichiers des thematiques ERC
+     * Methood de sauvergarde des fichiers par thematique 
+     * @param Request $request
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    /**
      * @param Request $request
      * @return \Symfony\Component\HttpFoundation\Response
      */
     public function createAction(Request $request)
-     
-          $entity = new Erc;
-          $em = $this->getDoctrine()->getManager();
-          $ercs = $em->getRepository('ReglementairesErcBundle:Erc')->findAll();
-        
-          $form = $this->createForm(new ErcUploadThematiqueType(), $entity);
-          $form->bind($request);
-          $em = $this->getDoctrine()->getManager();
-          if ($form->isValid()) {
-              $em->persist($entity);
-              $em->flush();
+    {
+        $em = $this->getDoctrine()->getManager();
+        $formations = $em->getRepository('ReglementairesErcBundle:Formation')->findAll();
+//        $form = $this->createForm(new ErcUploadThematiqueType(), array(), array('ercs' => $ercs));
+        $form = $this->createForm(new ErcUploadThematiqueType(), array(), array('formations' => $formations));
 
-              $this->get("session")->getFlashBag()->add(FlashMessageConsts::MESSAGE_SUCCESS, "Vos données ont été correctement enregistrées.");
-              return $this->redirect($this->generateUrl('reglementaires_thematique_erc_import_new'));
-          }
-          $this->get("session")->getFlashBag()->add(FlashMessageConsts::MESSAGE_ERROR, "Vos données n'ont pas été correctement enregistrées.");
-          return $this->render('ReglementairesErcBundle:UploadThematiqueErc:new.html.twig', array(
-              'ercs' => $ercs,
-              'form' => $form->createView(),
-          ));
-        
+        $request = $this->getRequest();
+
+        $form->handleRequest($request);
+
+        if ('POST' === $request->getMethod()) {
+
+            if ($form->isValid()) {
+                /**  @var Formation $formation */
+                foreach ($formations as $index => $formation) {
+
+                    $key = sprintf("file-%s", $formation->getId());
+
+                    $file = $form->get($key)->getData();
+                    $name = $file->getClientOriginalName();
+                    $dir = __DIR__ . '/../../../../web/uploads/imports_csv/' . $formation->getLibelle() . '/';
+                    $file->move($dir, $name);
+
+//                    echo "<br> Key $key  <pre>";
+//                    echo "<br> File $file  <pre>";
+//                    echo "<br> Name $name <pre>";
+//                    echo "<br> DIR_ $dir  <pre>";
+//                    Debug::dump($file);
+//                    echo ' </pre>';
+//                    die();
+
+                    $this->get("session")->getFlashBag()->add(FlashMessageConsts::MESSAGE_SUCCESS, "Vos données ont été correctement enregistrées.");
+                    return $this->render('ReglementairesErcBundle:UploadThematiqueErc:new.html.twig', array(
+                        'formations' => $formations,
+                        'form' => $form->createView(),
+                    ));
+                }
+
+            }
+
+
+        } else {
+
+            $this->get("session")->getFlashBag()->add(FlashMessageConsts::MESSAGE_ERROR, "Vos données n'ont pas été correctement enregistrées.");
+            return $this->render('ReglementairesErcBundle:UploadThematiqueErc:new.html.twig', array(
+                'formations' => $formations,
+                'form' => $form->createView(),
+            ));
+        }
     }
 
     /**
@@ -55,12 +87,12 @@ class UploadThematiqueErcController extends Controller
      */
     public function newAction()
     {
-        $entity = new Erc();
+        $entity = new Formation();
 
         $em = $this->getDoctrine()->getManager();
-        $ercs = $em->getRepository('ReglementairesErcBundle:Erc')->findAll();
+        $Formations = $em->getRepository('ReglementairesErcBundle:Formation')->findAll();
 
-        $form = $this->createForm(new ErcUploadThematiqueType(), array(), array('ercs' => $ercs));
+        $form = $this->createForm(new ErcUploadThematiqueType(), array(), array('Formations' => $Formations));
 
         return $this->render('ReglementairesErcBundle:UploadThematiqueErc:new.html.twig', array(
             'form' => $form->createView(),
